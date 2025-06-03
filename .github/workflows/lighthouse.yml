@@ -1,15 +1,10 @@
 name: Lighthouse CI
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      url:
-        description: "URL to run Lighthouse on"
-        required: false
-        default: "https://d1dp7q1h3uhnyu.cloudfront.net/"
+  workflow_run:
+    workflows: ["Deploy to S3"]
+    types:
+      - completed
 
 permissions:
   issues: write
@@ -17,30 +12,16 @@ permissions:
 
 jobs:
   lighthouse-audit:
-    name: Lighthouse Audit
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: |
-          npm install -g @lhci/cli@0.14.x
-          npm install -g http-server
-
-      - name: Start local server
-        run: http-server . -p 8080 &
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.14.x
 
       - name: Run Lighthouse CI
         id: lighthouse
         continue-on-error: true
-        run: |
-          URL="${{ github.event.inputs.url || 'https://d1dp7q1h3uhnyu.cloudfront.net/' }}"
-          lhci autorun --collect.url=$URL
+        run: lhci autorun --collect.url=https://d1dp7q1h3uhnyu.cloudfront.net/
 
       - name: Create GitHub Issue with Results
         if: always()
@@ -67,9 +48,7 @@ jobs:
                 INP: { good: 200, needsImprovement: 500 },
                 CLS: { good: 0.1, needsImprovement: 0.25 },
               };
-              
               if (!thresholds[metric]) return value >= 90 ? '🟢' : value >= 50 ? '🟠' : '🔴';
-              
               const t = thresholds[metric];
               return value <= t.good ? '🟢' : value <= t.needsImprovement ? '🟠' : '🔴';
             };
@@ -99,7 +78,7 @@ jobs:
             const lighthouseScores = {
               performance: getLighthouseResult(report, 'performance'),
               accessibility: getLighthouseResult(report, 'accessibility'),
-              'best-practices': getLighthouseResult(report, 'best-practices'),
+              bestPractices: getLighthouseResult(report, 'best-practices'),
               seo: getLighthouseResult(report, 'seo'),
               pwa: getLighthouseResult(report, 'pwa')
             };
