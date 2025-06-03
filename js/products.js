@@ -5,16 +5,12 @@ async function loadProducts() {
 }
 
 function displayProducts(products) {
-  // Find the container where products will be displayed
   const container = document.querySelector("#all-products .container");
 
-  // Iterate over each product and create the HTML structure safely
   products.forEach((product) => {
-    // Create the main product div
     const productElement = document.createElement("div");
     productElement.classList.add("product");
 
-    // Create the product picture div
     const pictureDiv = document.createElement("div");
     pictureDiv.classList.add("product-picture");
     const img = document.createElement("img");
@@ -24,7 +20,6 @@ function displayProducts(products) {
     img.width = 250;
     pictureDiv.appendChild(img);
 
-    // Create the product info div
     const infoDiv = document.createElement("div");
     infoDiv.classList.add("product-info");
 
@@ -45,24 +40,38 @@ function displayProducts(products) {
     const button = document.createElement("button");
     button.textContent = "Add to bag";
 
-    // Append elements to the product info div
     infoDiv.appendChild(category);
     infoDiv.appendChild(title);
     infoDiv.appendChild(price);
     infoDiv.appendChild(button);
 
-    // Append picture and info divs to the main product element
     productElement.appendChild(pictureDiv);
     productElement.appendChild(infoDiv);
 
-    // Append the new product element to the container
     container.appendChild(productElement);
   });
 }
 
-loadProducts();
+window.onload = () => {
+  let status = "idle";
+  const productSection = document.querySelector("#all-products");
 
-// Simulate heavy operation. It could be a complex price calculation.
-for (let i = 0; i < 10000000; i++) {
-  const temp = Math.sqrt(i) * Math.sqrt(i);
-}
+  const worker = new Worker("worker.js");
+  worker.onmessage = (e) => {
+    if (e.data === "heavy-task-done") {
+      console.log("Heavy task completed (via worker)");
+    }
+  };
+
+  window.onscroll = () => {
+    const position =
+      productSection.getBoundingClientRect().top -
+      (window.scrollY + window.innerHeight);
+
+    if (status === "idle" && position <= 0) {
+      status = "loading";
+      loadProducts();
+      worker.postMessage("start-heavy-task"); // Web Worker로 무거운 연산 수행
+    }
+  };
+};
