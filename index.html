@@ -73,7 +73,15 @@
             <li><a href="about.html">About us</a></li>
             <li><a href="index.html#best-sellers-section">Best Sellers</a></li>
             <li><a href="index.html#newsletter-section">Newsletter</a></li>
-            <li class="menu-icon"><img src="images/menu_icon.webp" /></li>
+            <li class="menu-icon">
+              <img
+                src="images/menu_icon.webp"
+                alt="Menu"
+                role="button"
+                tabindex="0"
+                aria-label="Open menu"
+              />
+            </li>
           </ul>
         </nav>
       </div>
@@ -102,7 +110,7 @@
             Sed ut perspiciatis unde omnis iste natus error sit voluptatem
             accusantium doloremque laudantium.
           </p>
-          <button>View Headsets</button>
+          <button aria-label="View Headsets">View Headsets</button>
         </div>
       </div>
     </section>
@@ -178,6 +186,9 @@
       <h3>Newsletter Signup</h3>
       <p>Subscribe now and don't miss a single deal!</p>
       <form>
+        <label for="newsletter-email" class="visually-hidden"
+          >Email address</label
+        >
         <input type="email" name="email" placeholder="Your email..." />
         <button type="submit">Subscribe</button>
       </form>
@@ -226,7 +237,12 @@
       <div class="copyright-text">2020 &copy; All Rights Reserved</div>
     </footer>
 
-    <a href="#" id="open_preferences_center">Update cookies preferences</a>
+    <a
+      href="#"
+      id="open_preferences_center"
+      aria-label="Update cookie preferences"
+      >Update cookies preferences</a
+    >
 
     <script type="text/javascript" src="/js/main.js"></script>
     <script type="text/javascript" src="/js/products.js"></script>
